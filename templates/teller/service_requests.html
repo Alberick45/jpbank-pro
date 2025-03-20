@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+
+{% block title %}Service Requests{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="mb-3">
+                <i class="fas fa-ticket-alt me-2"></i>Service Requests
+            </h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('customer_service') }}">Customer Service</a></li>
+                    <li class="breadcrumb-item active">Service Requests</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form id="filterForm" class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="all" {% if current_status == 'all' %}selected{% endif %}>All</option>
+                                <option value="Pending" {% if current_status == 'Pending' %}selected{% endif %}>Pending</option>
+                                <option value="In Progress" {% if current_status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                                <option value="Completed" {% if current_status == 'Completed' %}selected{% endif %}>Completed</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Priority</label>
+                            <select class="form-select" name="priority">
+                                <option value="all" {% if current_priority == 'all' %}selected{% endif %}>All</option>
+                                <option value="High" {% if current_priority == 'High' %}selected{% endif %}>High</option>
+                                <option value="Medium" {% if current_priority == 'Medium' %}selected{% endif %}>Medium</option>
+                                <option value="Low" {% if current_priority == 'Low' %}selected{% endif %}>Low</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Sort By</label>
+                            <select class="form-select" name="sort_by">
+                                <option value="created_at" {% if current_sort == 'created_at' %}selected{% endif %}>Date Created</option>
+                                <option value="priority" {% if current_sort == 'priority' %}selected{% endif %}>Priority</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Order</label>
+                            <select class="form-select" name="sort_order">
+                                <option value="desc" {% if current_order == 'desc' %}selected{% endif %}>Descending</option>
+                                <option value="asc" {% if current_order == 'asc' %}selected{% endif %}>Ascending</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="input-group">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search requests...">
+                        <button class="btn btn-outline-primary" type="button" id="searchButton">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Service Requests Table -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Service Requests</h5>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newRequestModal">
+                <i class="fas fa-plus me-1"></i>New Request
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Customer</th>
+                            <th>Type</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="requestsTableBody">
+                        {% for request in requests %}
+                        <tr>
+                            <td>{{ request.request_id }}</td>
+                            <td>{{ request.customer.cus_firstname }} {{ request.customer.cus_lastname }}</td>
+                            <td>{{ request.request_type }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'danger' if request.priority == 'High' else 'warning' if request.priority == 'Medium' else 'info' }}">
+                                    {{ request.priority }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-{{ 'warning' if request.status == 'Pending' else 'info' if request.status == 'In Progress' else 'success' }}">
+                                    {{ request.status }}
+                                </span>
+                            </td>
+                            <td>{{ request.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-info" onclick="viewRequest('{{ request.request_id }}')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    {% if request.status != 'Completed' %}
+                                    <button class="btn btn-sm btn-primary" onclick="updateRequest('{{ request.request_id }}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update Request Modal -->
+<div class="modal fade" id="updateRequestModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Request</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="updateRequestForm">
+                <div class="modal-body">
+                    <input type="hidden" id="updateRequestId">
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select class="form-select" name="status" required>
+                            <option value="Pending">Pending</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notes</label>
+                        <textarea class="form-control" name="notes" rows="3" placeholder="Add notes about the status update..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- New Request Modal -->
+<div class="modal fade" id="newRequestModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New Service Request</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('create_customer_service_request') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="customer_id" class="form-label">Customer*</label>
+                        <select class="form-select" id="customer_id" name="customer_id" required>
+                            <option value="">Select Customer</option>
+                            {% for customer in customers %}
+                            <option value="{{ customer.cus_id }}">{{ customer.cus_firstname }} {{ customer.cus_lastname }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="request_type" class="form-label">Request Type*</label>
+                        <select class="form-select" id="request_type" name="request_type" required>
+                            <option value="">Select Type</option>
+                            <option value="Card Issue">Card Issue</option>
+                            <option value="Lost Card">Lost Card</option>
+                            <option value="PIN Reset">PIN Reset</option>
+                            <option value="Contact Update">Contact Update</option>
+                            <option value="Account Issue">Account Issue</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description*</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="priority" class="form-label">Priority</label>
+                        <select class="form-select" id="priority" name="priority">
+                            <option value="Low">Low</option>
+                            <option value="Medium" selected>Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle filter changes
+    const filterForm = document.getElementById('filterForm');
+    filterForm.querySelectorAll('select').forEach(select => {
+        select.addEventListener('change', () => {
+            const params = new URLSearchParams(new FormData(filterForm));
+            window.location.href = `${window.location.pathname}?${params.toString()}`;
+        });
+    });
+
+    // Handle search
+    const searchInput = document.getElementById('searchInput');
+    const searchButton = document.getElementById('searchButton');
+    let searchTimeout;
+
+    function performSearch() {
+        const searchTerm = searchInput.value.trim();
+        if (searchTerm) {
+            fetch(`/customer-service/requests/search?q=${encodeURIComponent(searchTerm)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const tbody = document.getElementById('requestsTableBody');
+                        tbody.innerHTML = data.results.map(req => `
+                            <tr>
+                                <td>${req.id}</td>
+                                <td>${req.customer_name}</td>
+                                <td>${req.request_type}</td>
+                                <td>
+                                    <span class="badge bg-${req.priority === 'High' ? 'danger' : req.priority === 'Medium' ? 'warning' : 'info'}">
+                                        ${req.priority}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-${req.status === 'Pending' ? 'warning' : req.status === 'In Progress' ? 'info' : 'success'}">
+                                        ${req.status}
+                                    </span>
+                                </td>
+                                <td>${req.created_at}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-info" onclick="viewRequest('${req.id}')">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        ${req.status !== 'Completed' ? `
+                                        <button class="btn btn-sm btn-primary" onclick="updateRequest('${req.id}')">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        ` : ''}
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('');
+                    }
+                });
+        }
+    }
+
+    searchInput.addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(performSearch, 500);
+    });
+
+    searchButton.addEventListener('click', performSearch);
+});
+
+// Handle request updates
+function updateRequest(requestId) {
+    const modal = new bootstrap.Modal(document.getElementById('updateRequestModal'));
+    document.getElementById('updateRequestId').value = requestId;
+    modal.show();
+}
+
+document.getElementById('updateRequestForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const requestId = document.getElementById('updateRequestId').value;
+    const formData = new FormData(this);
+
+    fetch(`/customer-service/requests/${requestId}/update`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert('Error updating request: ' + data.error);
+        }
+    });
+});
+
+function viewRequest(requestId) {
+    window.location.href = `/customer-service/requests/${requestId}`;
+}
+</script>
+{% endblock %}

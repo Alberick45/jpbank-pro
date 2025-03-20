@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        {% if employee.emp_photo %}
+                            <img src="{{ url_for('static', filename='uploads/' + employee.emp_photo) }}" alt="Profile Photo" class="rounded-circle me-2" style="width: 50px; height: 50px;">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='img/default-avatar.png') }}" alt="Default Profile" class="rounded-circle me-2" style="width: 50px; height: 50px;">
+                        {% endif %}
+                        <div>
+                            <h6 class="mb-0">{{ employee.emp_firstname }} {{ employee.emp_lastname }}</h6>
+                            <small class="text-muted">{{ role.role_name }}</small>
+                        </div>
+                    </div>
+                    <div class="nav flex-column nav-pills">
+                        <a class="nav-link active" href="#security" data-bs-toggle="pill">Security</a>
+                        <a class="nav-link" href="#notifications" data-bs-toggle="pill">Notifications</a>
+                        <a class="nav-link" href="#preferences" data-bs-toggle="pill">Preferences</a>
+                        <a class="nav-link" href="#integrations" data-bs-toggle="pill">Integrations</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="tab-content">
+                <!-- Security Settings -->
+                <div class="tab-pane fade show active" id="security">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Security Settings</h5>
+                            
+                            <!-- Change Password -->
+                            <form action="{{ url_for('change_password') }}" method="POST" class="mb-4">
+                                <h6>Change Password</h6>
+                                <div class="mb-3">
+                                    <label for="current_password" class="form-label">Current Password</label>
+                                    <input type="password" class="form-control" id="current_password" name="current_password" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="new_password" class="form-label">New Password</label>
+                                    <input type="password" class="form-control" id="new_password" name="new_password" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="confirm_password" class="form-label">Confirm New Password</label>
+                                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Change Password</button>
+                            </form>
+
+                            <!-- Two-Factor Authentication -->
+                            <form action="{{ url_for('toggle_2fa') }}" method="POST">
+                                <h6>Two-Factor Authentication</h6>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="enable2fa" name="enabled" 
+                                           {% if user.usr_2fa_enabled %}checked{% endif %} onchange="this.form.submit()">
+                                    <label class="form-check-label" for="enable2fa">Enable Two-Factor Authentication</label>
+                                </div>
+                                {% if user.usr_2fa_enabled %}
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i>Two-factor authentication is currently enabled
+                                    </div>
+                                {% endif %}
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Settings -->
+                <div class="tab-pane fade" id="notifications">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Notification Settings</h5>
+                            <form action="{{ url_for('update_settings') }}" method="POST">
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="notify_security" name="notify_security"
+                                               {% if user.usr_notify_security %}checked{% endif %}>
+                                        <label class="form-check-label" for="notify_security">Security Alerts</label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="notify_system" name="notify_system"
+                                               {% if user.usr_notify_system %}checked{% endif %}>
+                                        <label class="form-check-label" for="notify_system">System Updates</label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="notify_marketing" name="notify_marketing"
+                                               {% if user.usr_notify_marketing %}checked{% endif %}>
+                                        <label class="form-check-label" for="notify_marketing">Marketing Updates</label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="notify_transactions" name="notify_transactions"
+                                               {% if user.usr_notify_transactions %}checked{% endif %}>
+                                        <label class="form-check-label" for="notify_transactions">Transaction Alerts</label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="notify_login" name="notify_login"
+                                               {% if user.usr_notify_login %}checked{% endif %}>
+                                        <label class="form-check-label" for="notify_login">Login Alerts</label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="notify_system_alerts" name="notify_system_alerts"
+                                               {% if user.usr_notify_system_alerts %}checked{% endif %}>
+                                        <label class="form-check-label" for="notify_system_alerts">System Alerts</label>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Save Notification Settings</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Display Preferences -->
+                <div class="tab-pane fade" id="preferences">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Display Preferences</h5>
+                            <form action="{{ url_for('update_settings') }}" method="POST">
+                                <div class="mb-3">
+                                    <label class="form-label">Theme</label>
+                                    <select class="form-select" name="theme">
+                                        <option value="light" {% if user.usr_theme == 'light' %}selected{% endif %}>Light</option>
+                                        <option value="dark" {% if user.usr_theme == 'dark' %}selected{% endif %}>Dark</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Font Size</label>
+                                    <select class="form-select" name="font_size">
+                                        <option value="small" {% if user.usr_font_size == 'small' %}selected{% endif %}>Small</option>
+                                        <option value="medium" {% if user.usr_font_size == 'medium' %}selected{% endif %}>Medium</option>
+                                        <option value="large" {% if user.usr_font_size == 'large' %}selected{% endif %}>Large</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <h6>Dashboard Components</h6>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="show_quick_actions" name="show_quick_actions"
+                                               {% if user.usr_show_quick_actions %}checked{% endif %}>
+                                        <label class="form-check-label" for="show_quick_actions">Show Quick Actions</label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="show_recent" name="show_recent"
+                                               {% if user.usr_show_recent %}checked{% endif %}>
+                                        <label class="form-check-label" for="show_recent">Show Recent Activities</label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="show_stats" name="show_stats"
+                                               {% if user.usr_show_stats %}checked{% endif %}>
+                                        <label class="form-check-label" for="show_stats">Show Statistics</label>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Save Display Preferences</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Integration Settings -->
+                <div class="tab-pane fade" id="integrations">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Integration Settings</h5>
+                            <form action="{{ url_for('update_settings') }}" method="POST">
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="calendar_integration" name="calendar_integration"
+                                               {% if user.usr_calendar_integration %}checked{% endif %}>
+                                        <label class="form-check-label" for="calendar_integration">Calendar Integration</label>
+                                    </div>
+                                    <small class="text-muted d-block mb-3">Sync your banking activities with your calendar</small>
+
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="email_integration" name="email_integration"
+                                               {% if user.usr_email_integration %}checked{% endif %}>
+                                        <label class="form-check-label" for="email_integration">Email Integration</label>
+                                    </div>
+                                    <small class="text-muted d-block mb-3">Receive transaction summaries via email</small>
+
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="analytics_integration" name="analytics_integration"
+                                               {% if user.usr_analytics_integration %}checked{% endif %}>
+                                        <label class="form-check-label" for="analytics_integration">Analytics Integration</label>
+                                    </div>
+                                    <small class="text-muted d-block mb-3">Enable detailed spending analytics</small>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Save Integration Settings</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

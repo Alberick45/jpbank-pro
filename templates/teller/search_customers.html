@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}Search Customers{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="mb-3">
+                <i class="fas fa-search me-2"></i>Customer Lookup
+            </h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('customer_service') }}">Customer Service</a></li>
+                    <li class="breadcrumb-item active">Search Customers</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <form method="GET" action="{{ url_for('search_customers') }}" class="row g-3">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" name="search" value="{{ search_term }}" placeholder="Search by name, email, or phone">
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search me-2"></i>Search
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {% if customers %}
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Search Results</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Customer ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Created On</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for customer in customers %}
+                                <tr>
+                                    <td>{{ customer.cus_id }}</td>
+                                    <td>{{ customer.cus_firstname }} {{ customer.cus_lastname }}</td>
+                                    <td>{{ customer.cus_email }}</td>
+                                    <td>{{ customer.cus_phone_nos }}</td>
+                                    <td>{{ customer.cus_created_on.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        <a href="{{ url_for('view_customer', customer_id=customer.cus_id) }}" class="btn btn-sm btn-info" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ url_for('edit_customer', customer_id=customer.cus_id) }}" class="btn btn-sm btn-warning" title="Edit Customer">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-primary" onclick="quickAction('{{ customer.cus_id }}')" title="Quick Actions">
+                                            <i class="fas fa-bolt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Quick Action Modal -->
+<div class="modal fade" id="quickActionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Service Request</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('quick_customer_service_request') }}">
+                <div class="modal-body">
+                    <input type="hidden" name="action_type" id="actionType">
+                    <div class="mb-3">
+                        <label for="customer_id" class="form-label">Customer*</label>
+                        <select class="form-select" id="customer_id" name="customer_id" required>
+                            <option value="">Select Customer</option>
+                            {% for customer in all_customers %}
+                            <option value="{{ customer.cus_id }}">{{ customer.cus_firstname }} {{ customer.cus_lastname }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description*</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group w-100">
+                        <button type="button" class="btn btn-outline-primary" onclick="setAction('Card Issue')">
+                            <i class="fas fa-credit-card me-1"></i>New Card
+                        </button>
+                        <button type="button" class="btn btn-outline-danger" onclick="setAction('Lost Card')">
+                            <i class="fas fa-exclamation-triangle me-1"></i>Lost Card
+                        </button>
+                        <button type="button" class="btn btn-outline-warning" onclick="setAction('PIN Reset')">
+                            <i class="fas fa-key me-1"></i>PIN Reset
+                        </button>
+                        <button type="button" class="btn btn-outline-info" onclick="setAction('Contact Update')">
+                            <i class="fas fa-address-card me-1"></i>Update Info
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function quickAction(customerId) {
+    // Pre-select the customer in the quick action modal
+    const customerSelect = document.querySelector('#quickActionModal select[name="customer_id"]');
+    customerSelect.value = customerId;
+    
+    // Show the modal
+    const modal = new bootstrap.Modal(document.getElementById('quickActionModal'));
+    modal.show();
+}
+
+function setAction(action) {
+    const actionTypeInput = document.getElementById('actionType');
+    const descriptionInput = document.getElementById('description');
+    actionTypeInput.value = action;
+    
+    // Set default description based on action type
+    const descriptions = {
+        'Card Issue': 'Customer requested a new card.',
+        'Lost Card': 'Customer reported a lost card that needs to be blocked.',
+        'PIN Reset': 'Customer requested a PIN reset.',
+        'Contact Update': 'Customer needs to update their contact information.'
+    };
+    descriptionInput.value = descriptions[action] || '';
+    
+    // Submit the form
+    document.querySelector('#quickActionModal form').submit();
+}
+</script>
+{% endblock %}

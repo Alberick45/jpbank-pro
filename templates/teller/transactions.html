@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Transactions{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="mb-3">
+                <i class="fas fa-exchange-alt me-2"></i>Transactions
+            </h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                    <li class="breadcrumb-item active">Transactions</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h5 class="card-title text-primary mb-3">
+                        <i class="fas fa-money-bill-wave me-2"></i>Cash Deposit
+                    </h5>
+                    <p class="card-text">Process cash deposits for customer accounts.</p>
+                    <a href="#" class="btn btn-primary">New Deposit</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h5 class="card-title text-primary mb-3">
+                        <i class="fas fa-money-bill me-2"></i>Cash Withdrawal
+                    </h5>
+                    <p class="card-text">Process cash withdrawals from accounts.</p>
+                    <a href="#" class="btn btn-primary">New Withdrawal</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h5 class="card-title text-primary mb-3">
+                        <i class="fas fa-exchange me-2"></i>Fund Transfer
+                    </h5>
+                    <p class="card-text">Transfer funds between accounts.</p>
+                    <a href="#" class="btn btn-primary">New Transfer</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h5 class="card-title text-primary mb-3">
+                        <i class="fas fa-file-invoice-dollar me-2"></i>Bill Payment
+                    </h5>
+                    <p class="card-text">Process bill payments for customers.</p>
+                    <a href="#" class="btn btn-primary">New Payment</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Recent Transactions</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Date & Time</th>
+                            <th>Type</th>
+                            <th>Account</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#TRX001</td>
+                            <td>2025-03-17 09:30</td>
+                            <td>Deposit</td>
+                            <td>1234567890</td>
+                            <td>$1,000.00</td>
+                            <td><span class="badge bg-success">Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td>#TRX002</td>
+                            <td>2025-03-17 10:15</td>
+                            <td>Withdrawal</td>
+                            <td>9876543210</td>
+                            <td>$500.00</td>
+                            <td><span class="badge bg-success">Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td>#TRX003</td>
+                            <td>2025-03-17 11:00</td>
+                            <td>Transfer</td>
+                            <td>5432167890</td>
+                            <td>$750.00</td>
+                            <td><span class="badge bg-warning">Pending</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

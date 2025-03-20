@@ -1,0 +1,388 @@
+{% extends "base.html" %}
+
+{% block title %}System Settings{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="mb-3">
+                <i class="fas fa-cogs me-2"></i>System Settings
+            </h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                    <li class="breadcrumb-item">Admin Panel</li>
+                    <li class="breadcrumb-item active">System Settings</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="nav flex-column nav-pills">
+                        <button class="nav-link active mb-2" data-bs-toggle="pill" data-bs-target="#general">
+                            <i class="fas fa-sliders-h me-2"></i>General Settings
+                        </button>
+                        <button class="nav-link mb-2" data-bs-toggle="pill" data-bs-target="#security">
+                            <i class="fas fa-shield-alt me-2"></i>Security Settings
+                        </button>
+                        <button class="nav-link mb-2" data-bs-toggle="pill" data-bs-target="#notifications">
+                            <i class="fas fa-bell me-2"></i>Notifications
+                        </button>
+                        <button class="nav-link mb-2" data-bs-toggle="pill" data-bs-target="#backup">
+                            <i class="fas fa-database me-2"></i>Backup & Recovery
+                        </button>
+                        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#maintenance">
+                            <i class="fas fa-tools me-2"></i>System Maintenance
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">System Status</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h6 class="mb-0">Server Status</h6>
+                            <small class="text-muted">All systems operational</small>
+                        </div>
+                        <span class="badge bg-success">Online</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h6 class="mb-0">Last Backup</h6>
+                            <small class="text-muted">2 hours ago</small>
+                        </div>
+                        <span class="badge bg-info">Recent</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">System Load</h6>
+                            <small class="text-muted">Normal operation</small>
+                        </div>
+                        <span class="badge bg-success">65%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-9">
+            <div class="tab-content">
+                <!-- General Settings -->
+                <div class="tab-pane fade show active" id="general">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">General Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <form>
+                                <div class="mb-4">
+                                    <h6 class="mb-3">Bank Information</h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Bank Name</label>
+                                            <input type="text" class="form-control" value="JP Bank">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Branch Code</label>
+                                            <input type="text" class="form-control" value="JPB001">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <h6 class="mb-3">Regional Settings</h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Time Zone</label>
+                                            <select class="form-select">
+                                                <option>Pacific/Honolulu</option>
+                                                <option>America/Los_Angeles</option>
+                                                <option>America/New_York</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Date Format</label>
+                                            <select class="form-select">
+                                                <option>MM/DD/YYYY</option>
+                                                <option>DD/MM/YYYY</option>
+                                                <option>YYYY-MM-DD</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <h6 class="mb-3">System Preferences</h6>
+                                    <div class="form-check form-switch mb-2">
+                                        <input class="form-check-input" type="checkbox" checked>
+                                        <label class="form-check-label">Enable System Notifications</label>
+                                    </div>
+                                    <div class="form-check form-switch mb-2">
+                                        <input class="form-check-input" type="checkbox" checked>
+                                        <label class="form-check-label">Auto Logout After Inactivity</label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" checked>
+                                        <label class="form-check-label">Enable Error Reporting</label>
+                                    </div>
+                                </div>
+
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Save Changes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Settings -->
+                <div class="tab-pane fade" id="security">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Security Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <form>
+                                <div class="mb-4">
+                                    <h6 class="mb-3">Password Policy</h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Minimum Password Length</label>
+                                            <input type="number" class="form-control" value="8">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Password Expiry (days)</label>
+                                            <input type="number" class="form-control" value="90">
+                                        </div>
+                                    </div>
+                                    <div class="form-check mt-3">
+                                        <input class="form-check-input" type="checkbox" checked>
+                                        <label class="form-check-label">Require Special Characters</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" checked>
+                                        <label class="form-check-label">Require Numbers</label>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <h6 class="mb-3">Session Settings</h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Session Timeout (minutes)</label>
+                                            <input type="number" class="form-control" value="30">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Max Login Attempts</label>
+                                            <input type="number" class="form-control" value="3">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Save Changes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications -->
+                <div class="tab-pane fade" id="notifications">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Notification Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <form>
+                                <div class="mb-4">
+                                    <h6 class="mb-3">Email Notifications</h6>
+                                    <div class="form-check form-switch mb-2">
+                                        <input class="form-check-input" type="checkbox" checked>
+                                        <label class="form-check-label">System Alerts</label>
+                                    </div>
+                                    <div class="form-check form-switch mb-2">
+                                        <input class="form-check-input" type="checkbox" checked>
+                                        <label class="form-check-label">Security Alerts</label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox">
+                                        <label class="form-check-label">Maintenance Updates</label>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <h6 class="mb-3">SMTP Settings</h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">SMTP Server</label>
+                                            <input type="text" class="form-control">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">SMTP Port</label>
+                                            <input type="number" class="form-control">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Username</label>
+                                            <input type="text" class="form-control">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Password</label>
+                                            <input type="password" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Save Changes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Backup & Recovery -->
+                <div class="tab-pane fade" id="backup">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Backup & Recovery</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <h6 class="mb-3">Automated Backups</h6>
+                                <div class="form-check form-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" checked>
+                                    <label class="form-check-label">Enable Automated Backups</label>
+                                </div>
+                                <div class="row g-3 mt-2">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Backup Frequency</label>
+                                        <select class="form-select">
+                                            <option>Every 6 Hours</option>
+                                            <option>Every 12 Hours</option>
+                                            <option>Daily</option>
+                                            <option>Weekly</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Retention Period (days)</label>
+                                        <input type="number" class="form-control" value="30">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <h6 class="mb-3">Manual Backup</h6>
+                                <button class="btn btn-primary">
+                                    <i class="fas fa-download me-2"></i>Create Backup Now
+                                </button>
+                            </div>
+
+                            <div class="mb-4">
+                                <h6 class="mb-3">Recent Backups</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Size</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>2025-03-17 01:00</td>
+                                                <td>2.5 GB</td>
+                                                <td><span class="badge bg-success">Completed</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-download"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>2025-03-16 19:00</td>
+                                                <td>2.4 GB</td>
+                                                <td><span class="badge bg-success">Completed</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-download"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Maintenance -->
+                <div class="tab-pane fade" id="maintenance">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">System Maintenance</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <h6 class="mb-3">Maintenance Schedule</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Next Maintenance</label>
+                                        <input type="datetime-local" class="form-control">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Duration (hours)</label>
+                                        <input type="number" class="form-control" value="2">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <h6 class="mb-3">System Cleanup</h6>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-primary">
+                                        <i class="fas fa-broom me-2"></i>Clear Cache
+                                    </button>
+                                    <button class="btn btn-outline-primary">
+                                        <i class="fas fa-trash me-2"></i>Clear Logs
+                                    </button>
+                                    <button class="btn btn-outline-primary">
+                                        <i class="fas fa-sync me-2"></i>Optimize Database
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <h6 class="mb-3">System Updates</h6>
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>System is up to date
+                                </div>
+                                <button class="btn btn-primary">
+                                    <i class="fas fa-download me-2"></i>Check for Updates
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

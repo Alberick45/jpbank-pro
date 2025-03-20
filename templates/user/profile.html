@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="profile-photo-container mb-3">
+                        {% if current_user.employee.emp_photo %}
+                            <img src="{{ url_for('static', filename='uploads/' + current_user.employee.emp_photo) }}" alt="Profile Photo" class="img-fluid rounded-circle">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='img/default-avatar.png') }}" alt="Default Profile" class="img-fluid rounded-circle">
+                        {% endif %}
+                    </div>
+                    <h4 class="card-title">{{ current_user.employee.emp_firstname }} {{ current_user.employee.emp_lastname }}</h4>
+                    <p class="text-muted">{{ current_user.role.role_name }}</p>
+                    <p class="text-muted">Last Login: {{ current_user.last_login }}</p>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h5 class="card-title">Contact Information</h5>
+                    <ul class="list-unstyled">
+                        <li><strong>Email:</strong> {{ current_user.employee.emp_email }}</li>
+                        <li><strong>Phone:</strong> {{ current_user.employee.emp_phone or 'Not set' }}</li>
+                        <li><strong>Address:</strong> {{ current_user.employee.emp_address or 'Not set' }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Profile Settings</h5>
+                    <form action="{{ url_for('update_profile') }}" method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="firstname" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="firstname" name="firstname" value="{{ current_user.employee.emp_firstname }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="lastname" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="lastname" name="lastname" value="{{ current_user.employee.emp_lastname }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ current_user.employee.emp_email }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" value="{{ current_user.employee.emp_phone }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Address</label>
+                            <textarea class="form-control" id="address" name="address" rows="3">{{ current_user.employee.emp_address }}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="photo" class="form-label">Profile Photo</label>
+                            <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
+                        </div>
+                        <div class="mb-3">
+                            <label for="language" class="form-label">Language</label>
+                            <select class="form-select" id="language" name="language">
+                                <option value="en" {% if current_user.usr_language == 'en' %}selected{% endif %}>English</option>
+                                <option value="es" {% if current_user.usr_language == 'es' %}selected{% endif %}>Spanish</option>
+                                <option value="fr" {% if current_user.usr_language == 'fr' %}selected{% endif %}>French</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="timezone" class="form-label">Timezone</label>
+                            <select class="form-select" id="timezone" name="timezone">
+                                <option value="UTC" {% if current_user.usr_timezone == 'UTC' %}selected{% endif %}>UTC</option>
+                                <option value="America/New_York" {% if current_user.usr_timezone == 'America/New_York' %}selected{% endif %}>Eastern Time</option>
+                                <option value="America/Chicago" {% if current_user.usr_timezone == 'America/Chicago' %}selected{% endif %}>Central Time</option>
+                                <option value="America/Denver" {% if current_user.usr_timezone == 'America/Denver' %}selected{% endif %}>Mountain Time</option>
+                                <option value="America/Los_Angeles" {% if current_user.usr_timezone == 'America/Los_Angeles' %}selected{% endif %}>Pacific Time</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Profile</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h5 class="card-title">Recent Activity</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaction in recent_transactions %}
+                                <tr>
+                                    <td>{{ transaction.tst_created_on.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>{{ transaction.tst_transaction_type }}</td>
+                                    <td>${{ "%.2f"|format(transaction.tst_amount) }}</td>
+                                    <td>{{ transaction.tst_description }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center">No recent transactions</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

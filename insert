@@ -1,0 +1,166 @@
+
+""" import pyodbc
+from datetime import datetime, date
+import bcrypt
+import os
+import uuid
+from urllib.parse import quote_plus
+
+# Database configuration
+driver = 'ODBC Driver 17 for SQL Server'
+server = 'localhost'
+database = 'jpbank_086'
+trusted_connection = 'yes'
+
+# Create connection string
+conn_str = f'DRIVER={driver};SERVER={server};DATABASE={database};Trusted_Connection={trusted_connection}'
+
+# Helper function to hash passwords
+def hash_password(password):
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+# Helper function to generate transaction reference
+def generate_reference():
+    return f"TRX{uuid.uuid4().hex[:8].upper()}"
+
+conn = pyodbc.connect(conn_str)
+cursor = conn.cursor()
+
+ """
+""" try:
+    # Sample data for user roles
+    roles = [
+        ('Admin', 'ADM', datetime.now(), datetime.now()),
+        ('Manager', 'MGR', datetime.now(), datetime.now()),
+        ('Teller', 'TLR', datetime.now(), datetime.now()),
+    ]
+
+    for i, role in enumerate(roles, 1):
+        cursor.execute("SET IDENTITY_INSERT tbl_user_roles_086 ON")
+        cursor.execute("""
+        """ INSERT INTO tbl_user_roles_086 (role_id, role_name, role_sht_name, role_created_date, role_edited_date)
+        VALUES (?, ?, ?, ?, ?) """
+        """, (i, *role))
+        cursor.execute("SET IDENTITY_INSERT tbl_user_roles_086 OFF")
+        conn.commit()  # Commit after each role
+
+    # Sample data for employees
+    employees = [
+        ('John', 'Doe', 'Smith', date(1985, 5, 15), 1, 1, 1, 1, 'john.doe@jpbank.com', '+1234567890', 1, 100, 1, datetime.now(), datetime.now(), 'ADM1', 'ADM1'),
+        ('Jane', 'Smith', '', date(1990, 8, 20), 2, 1, 1, 2, 'jane.smith@jpbank.com', '+1234567891', 2, 150, 2, datetime.now(), datetime.now(), 'ADM1', 'ADM1'),
+        ('Mike', 'Johnson', '', date(1988, 3, 10), 1, 1, 1, 1, 'mike.j@jpbank.com', '+1234567892', 3, 120, 3, datetime.now(), datetime.now(), 'ADM1', 'ADM1'),
+    ]
+
+    for emp in employees:
+        cursor.execute("""
+"""         INSERT INTO tbl_employees_086 (emp_firstname, emp_lastname, emp_othernames, emp_dob, emp_gender_idfk, 
+        emp_nationality_idfk, emp_work_status_idfk, emp_marital_status_idfk, emp_email, emp_phone_nos, 
+        emp_address_idfk, emp_loyalty_point, emp_job_title_idfk, emp_created_on, emp_edited_on, 
+        emp_created_by_user_idfk, emp_edited_by_user_idfk)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) """
+        """, emp)
+        conn.commit()  # Commit after each employee
+
+    # Get the employee IDs for users
+    cursor.execute("SELECT emp_idpk FROM tbl_employees_086")
+    emp_ids = [row[0] for row in cursor.fetchall()]
+
+    # Sample data for users
+    users = [
+        ('johndoe', hash_password('password123'), emp_ids[0], 1, datetime.now(), None, 1, 1, datetime.now(), datetime.now()),
+        ('janesmith', hash_password('password123'), emp_ids[1], 2, datetime.now(), None, 1, 1, datetime.now(), datetime.now()),
+        ('mikej', hash_password('password123'), emp_ids[2], 3, datetime.now(), None, 1, 1, datetime.now(), datetime.now()),
+    ]
+
+    for user in users:
+        cursor.execute("""
+"""         INSERT INTO tbl_users_086 (usr_username, usr_password, usr_empidfk, usr_roleidfk, usr_start_date, 
+        usr_end_date, usr_created_by_userid, usr_edited_by_userid, usr_created_on, usr_edited_on)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) """
+        """, user)
+        conn.commit()  # Commit after each user
+
+    # Sample data for customers
+    customers = [
+        ('Alice', 'Johnson', '', date(1992, 6, 15), 2, 1, 1, 'Teacher', 'alice.j@email.com', '+1234567893', '123 Main St', 50, datetime.now(), datetime.now(), 'TLR1', 'TLR1'),
+        ('Bob', 'Williams', '', date(1988, 9, 20), 1, 1, 2, 'Engineer', 'bob.w@email.com', '+1234567894', '456 Oak Ave', 75, datetime.now(), datetime.now(), 'TLR1', 'TLR1'),
+        ('Carol', 'Davis', '', date(1995, 3, 10), 2, 1, 1, 'Doctor', 'carol.d@email.com', '+1234567895', '789 Pine Rd', 100, datetime.now(), datetime.now(), 'TLR1', 'TLR1'),
+        ('David', 'Brown', '', date(1990, 12, 5), 1, 1, 1, 'Lawyer', 'david.b@email.com', '+1234567896', '321 Elm St', 25, datetime.now(), datetime.now(), 'TLR1', 'TLR1'),
+        ('Eva', 'Miller', '', date(1993, 7, 25), 2, 1, 2, 'Architect', 'eva.m@email.com', '+1234567897', '654 Maple Dr', 150, datetime.now(), datetime.now(), 'TLR1', 'TLR1'),
+    ]
+
+    for customer in customers:
+        cursor.execute("""
+"""         INSERT INTO tbl_customers_086 (cus_firstname, cus_lastname, cus_othernames, cus_dob, cus_gender_idfk,
+        cus_nationality_idfk, cus_marital_status_idfk, cus_occupation, cus_email, cus_phone_nos, cus_address,
+        cus_loyalty_points, cus_created_on, cus_edited_on, cus_created_by_user_idfk, cus_edited_by_user_idfk)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) """
+        """, customer)
+        conn.commit()  # Commit after each customer
+
+    # Get customer IDs for accounts and KYC
+    cursor.execute("SELECT cus_id FROM tbl_customers_086")
+    customer_ids = [row[0] for row in cursor.fetchall()]
+
+    # Sample data for account details
+    accounts = [
+        (customer_ids[0], 'Savings', 5000.00),
+        (customer_ids[1], 'Checking', 3500.00),
+        (customer_ids[2], 'Savings', 7500.00),
+        (customer_ids[3], 'Checking', 2800.00),
+        (customer_ids[4], 'Savings', 10000.00),
+    ]
+
+    for account in accounts:
+        cursor.execute("""
+        INSERT INTO tbl_account_details_086 (acc_customer_id, acc_account_type, acc_balance)
+        VALUES (?, ?, ?)
+        """, account)
+        conn.commit()  # Commit after each account
+
+    # Sample data for KYC
+    kyc_records = [
+        (customer_ids[0], 'Passport', 'P123456789', 'docs/kyc/alice_passport.pdf', 1, datetime.now()),
+        (customer_ids[1], 'Driver License', 'DL987654321', 'docs/kyc/bob_dl.pdf', 1, datetime.now()),
+        (customer_ids[2], 'National ID', 'NI456789123', 'docs/kyc/carol_id.pdf', 2, datetime.now()),
+        (customer_ids[3], 'Passport', 'P987123456', 'docs/kyc/david_passport.pdf', 2, datetime.now()),
+        (customer_ids[4], 'Driver License', 'DL654321987', 'docs/kyc/eva_dl.pdf', 1, datetime.now()),
+    ]
+
+    for kyc in kyc_records:
+        cursor.execute("""
+        INSERT INTO tbl_kyc_086 (kyc_customer_id, kyc_id_type, kyc_id_number, kyc_document_url, kyc_verified_by, kyc_verified_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """, kyc)
+        conn.commit()  # Commit after each KYC record
+
+    # Get account numbers for transactions
+    cursor.execute("SELECT acc_account_number FROM tbl_account_details_086")
+    account_numbers = [row[0] for row in cursor.fetchall()]
+
+    # Sample transactions
+    transactions = [
+        (generate_reference(), account_numbers[0], 1000.00, 'Deposit', 'completed', 'Initial deposit', 'Deposit', None, 1, datetime.now(), datetime.now(), '127.0.0.1', 'Web Browser'),
+        (generate_reference(), account_numbers[1], 500.00, 'Withdrawal', 'completed', 'ATM withdrawal', 'Withdrawal', None, 1, datetime.now(), datetime.now(), '127.0.0.1', 'ATM'),
+        (generate_reference(), account_numbers[2], 2000.00, 'Deposit', 'completed', 'Salary deposit', 'Deposit', None, 2, datetime.now(), datetime.now(), '127.0.0.1', 'Web Browser'),
+        (generate_reference(), account_numbers[3], 300.00, 'Withdrawal', 'completed', 'Cash withdrawal', 'Withdrawal', None, 2, datetime.now(), datetime.now(), '127.0.0.1', 'Branch'),
+        (generate_reference(), account_numbers[4], 1500.00, 'Deposit', 'completed', 'Check deposit', 'Deposit', None, 3, datetime.now(), datetime.now(), '127.0.0.1', 'Mobile App'),
+    ]
+
+    for transaction in transactions:
+        cursor.execute("""
+        INSERT INTO tbl_transactions_086 (tst_reference, tst_account_number, tst_amount, tst_transaction_type, 
+        tst_status, tst_description, tst_category, tst_recipient_account, tst_created_by_user_id, tst_created_on, 
+        tst_completed_on, tst_ip_address, tst_device_info)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, transaction)
+        conn.commit()  # Commit after each transaction
+
+    print("Sample data has been successfully inserted into the database.")
+
+except Exception as e:
+    print(f"An error occurred: {str(e)}")
+    conn.rollback()
+
+finally:
+    conn.close() """

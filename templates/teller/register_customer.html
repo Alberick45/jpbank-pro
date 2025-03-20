@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Register New Customer{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="mb-3">
+                <i class="fas fa-user-plus me-2"></i>Register New Customer
+            </h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('customer_service') }}">Customer Service</a></li>
+                    <li class="breadcrumb-item active">Register Customer</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" class="needs-validation" novalidate>
+                        {{ form.csrf_token }}
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                {{ form.firstname.label(class="form-label") }}
+                                {{ form.firstname(class="form-control") }}
+                                {% if form.firstname.errors %}
+                                    <div class="invalid-feedback">{{ form.firstname.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.lastname.label(class="form-label") }}
+                                {{ form.lastname(class="form-control") }}
+                                {% if form.lastname.errors %}
+                                    <div class="invalid-feedback">{{ form.lastname.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.othernames.label(class="form-label") }}
+                                {{ form.othernames(class="form-control") }}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                {{ form.email.label(class="form-label") }}
+                                {{ form.email(class="form-control") }}
+                                {% if form.email.errors %}
+                                    <div class="invalid-feedback">{{ form.email.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.phone_nos.label(class="form-label") }}
+                                {{ form.phone_nos(class="form-control") }}
+                                {% if form.phone_nos.errors %}
+                                    <div class="invalid-feedback">{{ form.phone_nos.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                {{ form.dob.label(class="form-label") }}
+                                {{ form.dob(class="form-control", type="date") }}
+                                {% if form.dob.errors %}
+                                    <div class="invalid-feedback">{{ form.dob.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.gender.label(class="form-label") }}
+                                {{ form.gender(class="form-select") }}
+                                {% if form.gender.errors %}
+                                    <div class="invalid-feedback">{{ form.gender.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.marital_status.label(class="form-label") }}
+                                {{ form.marital_status(class="form-select") }}
+                                {% if form.marital_status.errors %}
+                                    <div class="invalid-feedback">{{ form.marital_status.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                {{ form.nationality.label(class="form-label") }}
+                                {{ form.nationality(class="form-select") }}
+                                {% if form.nationality.errors %}
+                                    <div class="invalid-feedback">{{ form.nationality.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.occupation.label(class="form-label") }}
+                                {{ form.occupation(class="form-control") }}
+                                {% if form.occupation.errors %}
+                                    <div class="invalid-feedback">{{ form.occupation.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                {{ form.address.label(class="form-label") }}
+                                {{ form.address(class="form-control", rows=3) }}
+                                {% if form.address.errors %}
+                                    <div class="invalid-feedback">{{ form.address.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                {{ form.id_type.label(class="form-label") }}
+                                {{ form.id_type(class="form-select") }}
+                                {% if form.id_type.errors %}
+                                    <div class="invalid-feedback">{{ form.id_type.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.id_number.label(class="form-label") }}
+                                {{ form.id_number(class="form-control") }}
+                                {% if form.id_number.errors %}
+                                    <div class="invalid-feedback">{{ form.id_number.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Register Customer
+                            </button>
+                            <a href="{{ url_for('customer_service') }}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Help
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p>Fill in the customer details to register them in the system. Fields marked with * are required.</p>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success me-2"></i>Provide accurate information</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Verify ID documents</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Get customer signature</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
